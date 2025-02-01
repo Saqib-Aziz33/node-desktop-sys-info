@@ -17,7 +17,6 @@ function separator() {
   return "<tr><th>---------------------------------------</th><td>---------------------------------------</td></tr>";
 }
 
-// Function to generate system summary
 async function generateSystemSummary() {
   try {
     // Get system information
@@ -397,9 +396,30 @@ ${printer
 
     spinner.text = "Generating summary...";
 
-    // Save the HTML file
+    // Save to HTML file
     const fileName = `${cpu.brand}_system_summary.html`;
     fs.writeFileSync(fileName, htmlContent, "utf-8");
+    // json file
+    fs.writeFileSync(
+      fileName.replace("html", "json"),
+      JSON.stringify(
+        {
+          cpu,
+          memory,
+          os,
+          disk,
+          network,
+          battery,
+          graphics,
+          printer,
+          audio,
+          bluetooth,
+        },
+        null,
+        2
+      ),
+      "utf-8"
+    );
     spinner.stop();
     console.log(`System summary HTML file created as ${fileName}`);
   } catch (error) {
@@ -407,5 +427,4 @@ ${printer
   }
 }
 
-// Generate system summary
 generateSystemSummary();
