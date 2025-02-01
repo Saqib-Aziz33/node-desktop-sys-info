@@ -1,3 +1,3 @@
 const si = require("systeminformation");
 
-si.cpu().then((data) => console.log(data));
+si.battery().then((data) => console.log(data));

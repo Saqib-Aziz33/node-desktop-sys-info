@@ -1,6 +1,19 @@
 const si = require("systeminformation");
 const fs = require("fs");
 
+function formatBytes(bytes) {
+  if (bytes === 0) return "0 Bytes";
+
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+
+  return (bytes / Math.pow(1024, i)).toFixed(2) + " " + sizes[i];
+}
+
+function separator() {
+  return "<tr><th></th><td>---------------------------------------</td></tr>";
+}
+
 // Function to generate system summary
 async function generateSystemSummary() {
   try {
@@ -92,26 +105,64 @@ async function generateSystemSummary() {
 
         <h2>Memory Information</h2>
         <table>
-            <tr><th>Total Memory</th><td>${(memory.total / 1024 ** 3).toFixed(
-              2
-            )} GB</td></tr>
-            <tr><th>Free Memory</th><td>${(memory.free / 1024 ** 3).toFixed(
-              2
-            )} GB</td></tr>
-            <tr><th>Used Memory</th><td>${(memory.used / 1024 ** 3).toFixed(
-              2
-            )} GB</td></tr>
+            <tr><th>Total Memory</th><td>${formatBytes(memory.total)}</td></tr>
+            <tr><th>Free Memory</th><td>${formatBytes(memory.free)}</td></tr>
+            <tr><th>Used Memory</th><td>${formatBytes(memory.used)}</td></tr>
+            <tr><th>Active Memory</th><td>${formatBytes(
+              memory.active
+            )}</td></tr>
+            <tr><th>Active Available</th><td>${formatBytes(
+              memory.available
+            )}</td></tr>
+            <tr><th>Buffers</th><td>${memory.buffers}</td></tr>
+            <tr><th>Cached</th><td>${memory.cached}</td></tr>
+            <tr><th>Slab</th><td>${memory.slab}</td></tr>
+            <tr><th>Buffers</th><td>${memory.buffers}</td></tr>
+            <tr><th>Swap Total</th><td>${formatBytes(
+              memory.swaptotal
+            )}</td></tr>
+            <tr><th>Swap Used</th><td>${formatBytes(memory.swapused)}</td></tr>
+            <tr><th>Swap Free</th><td>${formatBytes(memory.swapfree)}</td></tr>
+            <tr><th>Writeback</th><td>${memory.writeback}</td></tr>
+            <tr><th>Dirty</th><td>${memory.dirty}</td></tr>
         </table>
 
         <h2>Disk Information</h2>
         <table>
             ${disk
               .map(
-                (diskInfo) => `
-            <tr><th>Disk Model</th><td>${diskInfo.model}</td></tr>
-            <tr><th>Disk Size</th><td>${(diskInfo.size / 1024 ** 3).toFixed(
-              2
-            )} GB</td></tr>
+                (diskInfo, idx) => `
+                ${idx !== 0 ? separator() : ""}
+            <tr><th>Device</th><td><b>${diskInfo.device}</b></td></tr>
+            <tr><th>Disk Name</th><td>${diskInfo.name}</td></tr>
+            <tr><th>Disk Vendor</th><td>${diskInfo.vendor}</td></tr>
+            <tr><th>Disk Size</th><td>${formatBytes(diskInfo.size)}</td></tr>
+            <tr><th>Disk Bytes per Sector</th><td>${
+              diskInfo.bytesPerSector
+            }</td></tr>
+            <tr><th>Disk Total Cylinders</th><td>${
+              diskInfo.totalCylinders
+            }</td></tr>
+            <tr><th>Disk Total Heads</th><td>${diskInfo.totalHeads}</td></tr>
+            <tr><th>Disk Total Sectors</th><td>${
+              diskInfo.totalSectors
+            }</td></tr>
+            <tr><th>Disk Total Tracks</th><td>${diskInfo.totalTracks}</td></tr>
+            <tr><th>Disk Track per Cylinder</th><td>${
+              diskInfo.tracksPerCylinder
+            }</td></tr>
+            <tr><th>Disk Sectors per Track</th><td>${
+              diskInfo.sectorsPerTrack
+            }</td></tr>
+            <tr><th>Disk Firmware Revision</th><td>${
+              diskInfo.firmwareRevision
+            }</td></tr>
+            <tr><th>Disk Serial Number</th><td>${diskInfo.serialNum}</td></tr>
+            <tr><th>Disk Interface Type</th><td>${
+              diskInfo.interfaceType
+            }</td></tr>
+            <tr><th>Disk Smart Status</th><td>${diskInfo.smartStatus}</td></tr>
+            <tr><th>Disk Temperature</th><td>${diskInfo.temperature}</td></tr>
             `
               )
               .join("")}
@@ -121,20 +172,67 @@ async function generateSystemSummary() {
         <table>
             ${network
               .map(
-                (networkInfo) => `
+                (networkInfo, idx) => `
+            ${idx !== 0 ? separator() : ""}
             <tr><th>Interface</th><td>${networkInfo.iface}</td></tr>
-            <tr><th>IP Address</th><td>${networkInfo.ip4}</td></tr>
+            <tr><th>Interface Name</th><td>${networkInfo.ifaceName}</td></tr>
+            <tr><th>Default</th><td>${networkInfo.default}</td></tr>
+            <tr><th>IP Address (IPv4)</th><td>${networkInfo.ip4}</td></tr>
+            <tr><th>IPv4 Subnet</th><td>${networkInfo.ip4subnet}</td></tr>
+            <tr><th>IP Address (IPv6)</th><td>${networkInfo.ip6}</td></tr>
+            <tr><th>IPv6 Subnet</th><td>${networkInfo.ip6subnet}</td></tr>
+            <tr><th>MAC Address</th><td>${networkInfo.mac}</td></tr>
+            <tr><th>Internal</th><td>${networkInfo.internal}</td></tr>
+            <tr><th>Virtual</th><td>${networkInfo.virtual}</td></tr>
+            <tr><th>Operational State</th><td>${networkInfo.operstate}</td></tr>
+            <tr><th>Type</th><td>${networkInfo.type}</td></tr>
+            <tr><th>Duplex</th><td>${networkInfo.duplex}</td></tr>
+            <tr><th>MTU</th><td>${networkInfo.mtu}</td></tr>
+            <tr><th>Speed</th><td>${networkInfo.speed}</td></tr>
+            <tr><th>DHCP</th><td>${networkInfo.dhcp}</td></tr>
+            <tr><th>DNS Suffix</th><td>${networkInfo.dnsSuffix}</td></tr>
+            <tr><th>IEEE 802.1X Authentication</th><td>${
+              networkInfo.ieee8021xAuth
+            }</td></tr>
+            <tr><th>IEEE 802.1X State</th><td>${
+              networkInfo.ieee8021xState
+            }</td></tr>
+            <tr><th>Carrier Changes</th><td>${
+              networkInfo.carrierChanges
+            }</td></tr>
+
             `
               )
               .join("")}
         </table>
 
+
         <h2>Battery Information</h2>
         <table>
-            <tr><th>Battery Is Charging</th><td>${
-              battery.ischarging ? "Yes" : "No"
-            }</td></tr>
-            <tr><th>Battery Percentage</th><td>${battery.percent}%</td></tr>
+           <tr><th>Has Battery</th><td>${
+             battery.hasBattery ? "Yes" : "No"
+           }</td></tr>
+        <tr><th>Cycle Count</th><td>${battery.cycleCount}</td></tr>
+        <tr><th>Is Charging</th><td>${
+          battery.isCharging ? "Yes" : "No"
+        }</td></tr>
+        <tr><th>Designed Capacity</th><td>${battery.designedCapacity}</td></tr>
+        <tr><th>Max Capacity</th><td>${battery.maxCapacity}</td></tr>
+        <tr><th>Current Capacity</th><td>${battery.currentCapacity}</td></tr>
+        <tr><th>Voltage</th><td>${battery.voltage}</td></tr>
+        <tr><th>Capacity Unit</th><td>${battery.capacityUnit}</td></tr>
+        <tr><th>Battery Percentage</th><td>${battery.percent}</td></tr>
+        <tr><th>Time Remaining (in seconds)</th><td>${
+          battery.timeRemaining
+        }</td></tr>
+        <tr><th>AC Connected</th><td>${
+          battery.acConnected ? "Yes" : "No"
+        }</td></tr>
+        <tr><th>Battery Type</th><td>${battery.type}</td></tr>
+        <tr><th>Model</th><td>${battery.model}</td></tr>
+        <tr><th>Manufacturer</th><td>${battery.manufacturer}</td></tr>
+        <tr><th>Serial Number</th><td>${battery.serial}</td></tr>
+
         </table>
     </body>
     </html>
