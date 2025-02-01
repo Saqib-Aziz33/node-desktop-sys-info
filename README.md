@@ -1,5 +1,15 @@
 # System General Information
 
+This script will generate System information report (win/linux/mac) in HTML and JSON formats
+
+### Run
+
+```bash
+npm install
+
+npm start
+```
+
 ### Build
 
 ```bash

@@ -2,6 +2,9 @@
   "name": "system-information",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": "20.18.0"
+  },
   "scripts": {
     "start": "node index.js",
     "build": "rimraf system-summary.exe && pkg index.js --targets node16-win-x64 --output system-summary.exe"
