@@ -1,3 +1,4 @@
 /node_modules
-system_summary.html
+
+*.html
 *.exe

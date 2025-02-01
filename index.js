@@ -1,5 +1,8 @@
 const si = require("systeminformation");
 const fs = require("fs");
+const ora = require("ora");
+
+const spinner = ora("Scanning System...").start();
 
 function formatBytes(bytes) {
   if (bytes === 0) return "0 Bytes";
@@ -392,9 +395,13 @@ ${printer
     </html>
     `;
 
+    spinner.text = "Generating summary...";
+
     // Save the HTML file
-    fs.writeFileSync("system_summary.html", htmlContent, "utf-8");
-    console.log('System summary HTML file created as "system_summary.html"');
+    const fileName = `${cpu.brand}_system_summary.html`;
+    fs.writeFileSync(fileName, htmlContent, "utf-8");
+    spinner.stop();
+    console.log(`System summary HTML file created as ${fileName}`);
   } catch (error) {
     console.error("Error generating system summary:", error);
   }
