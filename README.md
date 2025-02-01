@@ -1,6 +1,6 @@
 # System General Information
 
-This script will generate System information report (win/linux/mac) in HTML and JSON formats
+This script will generate System information report (win/linux/mac) in HTML and JSON formats, using [systeminformation](https://www.npmjs.com/package/systeminformation) package
 
 ### Run
 
