@@ -11,20 +11,35 @@ function formatBytes(bytes) {
 }
 
 function separator() {
-  return "<tr><th></th><td>---------------------------------------</td></tr>";
+  return "<tr><th>---------------------------------------</th><td>---------------------------------------</td></tr>";
 }
 
 // Function to generate system summary
 async function generateSystemSummary() {
   try {
     // Get system information
-    const [cpu, memory, os, disk, network, battery] = await Promise.all([
+    const [
+      cpu,
+      memory,
+      os,
+      disk,
+      network,
+      battery,
+      graphics,
+      printer,
+      audio,
+      bluetooth,
+    ] = await Promise.all([
       si.cpu(),
       si.mem(),
       si.osInfo(),
       si.diskLayout(),
       si.networkInterfaces(),
       si.battery(),
+      si.graphics(),
+      si.printer(),
+      si.audio(),
+      si.bluetoothDevices(),
     ]);
 
     // Create HTML content
@@ -234,6 +249,145 @@ async function generateSystemSummary() {
         <tr><th>Serial Number</th><td>${battery.serial}</td></tr>
 
         </table>
+
+        
+          <h2>Graphics Controllers</h2>
+          <table>
+          ${graphics.controllers
+            .map(
+              (controller, idx) => `
+              ${idx !== 0 ? separator() : ""}
+  <tr><th>Controller Vendor</th><td>${controller.vendor}</td></tr>
+  <tr><th>Controller Sub-Vendor</th><td>${controller.subVendor}</td></tr>
+  <tr><th>Controller Model</th><td>${controller.model}</td></tr>
+  <tr><th>Bus</th><td>${controller.bus}</td></tr>
+  <tr><th>Bus Address</th><td>${controller.busAddress}</td></tr>
+  <tr><th>VRAM</th><td>${controller.vram} MB</td></tr>
+  <tr><th>Dynamic VRAM</th><td>${
+    controller.vramDynamic ? "Yes" : "No"
+  }</td></tr>
+  <tr><th>PCI ID</th><td>${controller.pciID || "N/A"}</td></tr>
+`
+            )
+            .join("")}
+          </table>
+
+
+          <h2>Display</h2>
+          <table>
+          ${graphics.displays
+            .map(
+              (display, idx) => `
+                ${idx !== 0 ? separator() : ""}
+                <tr><th>Display Vendor</th><td>${
+                  display.vendor || "N/A"
+                }</td></tr>
+                <tr><th>Display Model</th><td>${display.model}</td></tr>
+                <tr><th>Main Display</th><td>${
+                  display.main ? "Yes" : "No"
+                }</td></tr>
+                <tr><th>Built-in Display</th><td>${
+                  display.builtin ? "Yes" : "No"
+                }</td></tr>
+                <tr><th>Connection Type</th><td>${display.connection}</td></tr>
+                <tr><th>Display Size (X)</th><td>${
+                  display.sizeX || "N/A"
+                }</td></tr>
+                <tr><th>Display Size (Y)</th><td>${
+                  display.sizeY || "N/A"
+                }</td></tr>
+                <tr><th>Pixel Depth</th><td>${display.pixelDepth}</td></tr>
+                <tr><th>Resolution (X)</th><td>${display.resolutionX}</td></tr>
+                <tr><th>Resolution (Y)</th><td>${display.resolutionY}</td></tr>
+                <tr><th>Current Resolution (X)</th><td>${
+                  display.currentResX
+                }</td></tr>
+                <tr><th>Current Resolution (Y)</th><td>${
+                  display.currentResY
+                }</td></tr>
+                <tr><th>Position (X)</th><td>${display.positionX}</td></tr>
+                <tr><th>Position (Y)</th><td>${display.positionY}</td></tr>
+                <tr><th>Current Refresh Rate</th><td>${
+                  display.currentRefreshRate || "N/A"
+                }</td></tr>
+`
+            )
+            .join("")}
+</table>
+
+<h2>Printer</h2>
+<table>
+${printer
+  .map(
+    (printerItem, idx) => `
+       ${idx !== 0 ? separator() : ""}
+  <tr><th>Printer ID</th><td>${printerItem.id}</td></tr>
+  <tr><th>Printer Name</th><td>${printerItem.name}</td></tr>
+  <tr><th>Printer Model</th><td>${printerItem.model}</td></tr>
+  <tr><th>URI</th><td>${printerItem.uri || "N/A"}</td></tr>
+  <tr><th>UUID</th><td>${printerItem.uuid || "N/A"}</td></tr>
+  <tr><th>Status</th><td>${printerItem.status}</td></tr>
+  <tr><th>Local</th><td>${printerItem.local ? "Yes" : "No"}</td></tr>
+  <tr><th>Default</th><td>${printerItem.default ? "Yes" : "No"}</td></tr>
+  <tr><th>Shared</th><td>${printerItem.shared ? "Yes" : "No"}</td></tr>
+`
+  )
+  .join("")}
+</table>
+
+        <h2>Audio</h2>
+        <table>
+        ${audio
+          .map(
+            (audioItem, idx) => `
+               ${idx !== 0 ? separator() : ""}
+  <tr><th>Audio Device ID</th><td>${audioItem.id}</td></tr>
+  <tr><th>Audio Device Name</th><td>${audioItem.name}</td></tr>
+  <tr><th>Manufacturer</th><td>${audioItem.manufacturer}</td></tr>
+  <tr><th>Revision</th><td>${audioItem.revision || "N/A"}</td></tr>
+  <tr><th>Driver</th><td>${audioItem.driver || "N/A"}</td></tr>
+  <tr><th>Default</th><td>${audioItem.default ? "Yes" : "No"}</td></tr>
+  <tr><th>Channel</th><td>${audioItem.channel}</td></tr>
+  <tr><th>Type</th><td>${audioItem.type}</td></tr>
+  <tr><th>Input</th><td>${audioItem.in ? "Yes" : "No"}</td></tr>
+  <tr><th>Output</th><td>${audioItem.out ? "Yes" : "No"}</td></tr>
+  <tr><th>Status</th><td>${audioItem.status}</td></tr>
+`
+          )
+          .join("")}
+        </table>
+
+
+        <h2>Bluetooth</h2>
+        <table>
+        ${bluetooth
+          .map(
+            (bluetoothItem, idx) => `
+               ${idx !== 0 ? separator() : ""}
+                <tr><th>Device</th><td>${bluetoothItem.device}</td></tr>
+                <tr><th>Name</th><td>${bluetoothItem.name}</td></tr>
+                <tr><th>Manufacturer</th><td>${
+                  bluetoothItem.manufacturer
+                }</td></tr>
+                <tr><th>MAC Address (Device)</th><td>${
+                  bluetoothItem.macDevice
+                }</td></tr>
+                <tr><th>MAC Address (Host)</th><td>${
+                  bluetoothItem.macHost
+                }</td></tr>
+                <tr><th>Battery Percentage</th><td>${
+                  bluetoothItem.batteryPercent
+                }</td></tr>
+                <tr><th>Type</th><td>${bluetoothItem.type}</td></tr>
+                <tr><th>Connected</th><td>${
+                  bluetoothItem.connected ? "Yes" : "No"
+                }</td></tr>
+                `
+          )
+          .join("")}
+          </table>
+
+
     </body>
     </html>
     `;

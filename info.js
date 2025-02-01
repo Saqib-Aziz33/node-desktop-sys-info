@@ -1,3 +1,3 @@
 const si = require("systeminformation");
 
-si.battery().then((data) => console.log(data));
+si.bluetoothDevices().then((data) => console.log(data));
